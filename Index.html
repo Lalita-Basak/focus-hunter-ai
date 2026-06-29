@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOCUS HUNTER AI - Defeat Procrastination. Level Up Your Future.</title>
+    <style>
+        :root {
+            --bg-base: #020617;
+            --panel-bg: rgba(15, 23, 42, 0.65);
+            --panel-border: rgba(99, 102, 241, 0.2);
+            --panel-glow: rgba(99, 102, 241, 0.05);
+            
+            --neon-cyan: #06b6d4;
+            --neon-purple: #a855f7;
+            --neon-indigo: #6366f1;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --rank-color: #06b6d4;
+            --emergency-red: #ef4444;
+            --emergency-glow: rgba(239, 68, 68, 0.2);
+        }
+
+        .red-alert-active {
+            --panel-border: rgba(239, 68, 68, 0.4);
+            --panel-glow: rgba(239, 68, 68, 0.1);
+            --neon-indigo: #ef4444;
+            --neon-purple: #b91c1c;
+            background: radial-gradient(circle at 50% 50%, #1e0b0b 0%, #020617 100%) !important;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background: radial-gradient(circle at 50% 50%, #0f172a 0%, #020617 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        /* Floating Particle Background Elements */
+        .particles {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px);
+            background-size: 550px 550px, 350px 350px;
+            background-position: 0 0, 40px 60px;
+            opacity: 0.04;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Glass Panels */
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 0 20px var(--panel-glow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-panel:hover {
+            border-color: rgba(99, 102, 241, 0.35);
+        }
+
+        /* Top Header Navigation Dashboard Layout */
+        header {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media(min-width: 768px) {
+            header { flex-direction: row; }
+        }
+
+        .branding h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .branding p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.25rem;
+        }
+
+        /* Global Status System HUD */
+        .hud-status {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .hud-metric {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .rank-badge {
+            font-weight: 900;
+            font-size: 1.4rem;
+            color: var(--rank-color);
+            text-shadow: 0 0 10px var(--rank-color);
+        }
+
+        .streak-counter {
+            color: #f59e0b;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        }
+
+        /* XP Progress Module Bar Layout */
+        .xp-wrapper {
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .xp-text-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+        }
+
+        .xp-bar-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .xp-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-indigo));
+            box-shadow: 0 0 12px var(--neon-cyan);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Core Application Split Screen Structure Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        @media(min-width: 1024px) {
+            .dashboard-grid { grid-template-columns: 1fr 1.6fr; }
+        }
+
+        /* Interactive UI Elements & Inputs */
+        .form-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .flex-row-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Action Buttons Architecture Layout */
+        .btn {
+            padding: 0.75rem 1.2rem;
+            border-radius: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-indigo) 0%, var(--neon-purple) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-primary);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+        }
+
+        .mic-btn-inline {
+            position: absolute;
+            right: 8px;
+            top: 32px;
+            background: transparent;
+            border: none;
+            color: var(--neon-cyan);
+            cursor: pointer;
+            padding: 4px;
+            font-size: 1.2rem;
+        }
+
+        /* Target Dashboard Sections Architecture layout */
+        .card-header-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #e2e8f0;
+        }
+
+        /* Quest Card Board Items */
+        .quests-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .quest-card {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quest-card.priority-alert {
+            border-left: 4px solid var(--emergency-red);
+            box-shadow: inset 0 0 15px rgba(239,68,68,0.05);
+        }
+
+        .quest-card:not(.priority-alert) {
+            border-left: 4px solid var(--neon-cyan);
+        }
+
+        .quest-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .quest-title-text {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .quest-meta-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        .quest-meta-info span strong {
+            color: var(--text-primary);
+        }
+
+        /* Dynamic sub quest items checkboxes */
+        .sub-quests-wrapper {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .sub-quest-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            color: #cbd5e1;
+        }
+        
+        .sub-quest-item:last-child { margin-bottom: 0; }
+
+        .sub-quest-item input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+            accent-color: var(--neon-cyan);
+        }
+
+        .sub-quest-item.completed span {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        /* AI Insights Breakdown Section */
+        .ai-analysis-drawer {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.88rem;
+        }
+
+        .ai-analysis-grid-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .ai-pill {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .ai-pill-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .ai-pill-value {
+            font-weight: 700;
+            margin-top: 0.15rem;
+        }
+
+        .ai-strategy-text-block {
+            background: rgba(99, 102, 241, 0.04);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            border-radius: 8px;
+            padding: 0.75rem;
+            line-height: 1.4;
+            color: #cbd5e1;
+        }
+
+        /* AI Guide Companion Dashboard Panel */
+        .ai-guide-panel {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            margin-bottom: 1.5rem;
+        }
+
+        .avatar-container {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            animation: floating-ai 4s ease-in-out infinite;
+        }
+
+        @keyframes floating-ai {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .guide-speech-bubble {
+            font-size: 0.92rem;
+            line-height: 1.4;
+            color: #e2e8f0;
+        }
+
+        /* Screen Overlay Popups System Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: all 0.3s ease;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            opacity: 1; pointer-events: auto;
+        }
+
+        .modal-box {
+            background: #0f172a;
+            border: 2px solid var(--neon-indigo);
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(99,102,241,0.3);
+            transform: scale(0.9);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .reward-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #f59e0b, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        /* Red Alert Active UI Components */
+        .red-alert-banner {
+            background: linear-gradient(90deg, #b91c1c, #ef4444, #b91c1c);
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+            animation: pulse-red-banner 1.5s infinite;
+            display: none;
+        }
+
+        @keyframes pulse-red-banner {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .hidden { display: none !important; }
+        
+        /* Utility Configuration Header Settings */
+        .config-bar {
+            background: rgba(0,0,0,0.4);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        .config-bar input {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="particles"></div>
+
+    <div class="container">
+        
+        <div class="config-bar glass-panel">
+            <label style="margin-bottom:0; white-space:nowrap;" for="globalKeyField">Gemini API Key:</label>
+            <input type="password" id="globalKeyField" placeholder="Paste your v1beta API key here to enable live execution updates..." />
+        </div>
+
+        <div id="redAlertGlobalBanner" class="red-alert-banner">CRITICAL PHASING ACTIVATED: FAILURE IMMINENT. COMMENCE SURVIVAL TRACKS IMMEDIATELY.</div>
+
+        <header class="glass-panel" id="mainHeaderHUD">
+            <div class="branding">
+                <h1>FOCUS HUNTER AI</h1>
+                <p>Defeat procrastination. Level up your future.</p>
+            </div>
+            
+            <div class="hud-status">
+                <div class="hud-metric">
+                    <div class="metric-label">RANK</div>
+                    <div class="rank-badge" id="hudRank">E RANK</div>
+                </div>
+                <div class="hud-metric">
+                    <div class="metric-label">STREAK</div>
+                    <div class="streak-counter" id="hudStreak">🔥 0 DAYS</div>
+                </div>
+                <div class="xp-wrapper">
+                    <div class="xp-text-row">
+                        <span id="hudXpLabel">LEVEL EXP: 0 / 1000</span>
+                        <span id="hudLevelVal">LV 1</span>
+                    </div>
+                    <div class="xp-bar-container">
+                        <div class="xp-bar-fill" id="hudXpFill"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            
+            <div class="left-column-actions" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <div class="glass-panel ai-guide-panel">
+                    <div class="avatar-container">🤖</div>
+                    <div class="guide-speech-bubble">
+                        <strong style="color: var(--neon-cyan);">AI Guide Mentor:</strong><br>
+                        <span id="guideSpeechText">Greetings, Hunter. Your future rank depends on today's structural actions. Accept today's transactional quest parameters?</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel">
+                    <div class="card-header-title">Commence New Quest Log</div>
+                    <form id="questSubmissionForm">
+                        
+                        <div class="form-group">
+                            <label for="questNameInput">Quest Objective Title</label>
+                            <input type="text" id="questNameInput" placeholder="e.g., Build Financial Analytics Interface Dashboard" required>
+                            <button type="button" class="mic-btn-inline" id="voiceInputTriggerBtn" title="Speak Quest Objective">🎤</button>
+                        </div>
+
+                        <div class="flex-row-inputs">
+                            <div class="form-group">
+                                <label for="questDeadlineInput">Target Timeline Due Date</label>
+                                <input type="datetime-local" id="questDeadlineInput" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="questDifficultySelect">Quest Combat Difficulty</label>
+                                <select id="questDifficultySelect">
+                                    <option value="easy">Easy Entry (+50 XP)</option>
+                                    <option value="medium" selected>Medium Target (+150 XP)</option>
+                                    <option value="hard">Hard Vanguard (+300 XP)</option>
+                                    <option value="boss">Boss Fight Raid (+500 XP)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="questHoursInput">Estimated Execution Time Investment (Hours)</label>
+                            <input type="number" id="questHoursInput" min="1" max="200" placeholder="e.g., 6" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="questPurposeInput">Why is this specific goal important to you?</label>
+                            <textarea id="questPurposeInput" rows="2" placeholder="e.g., I want to establish absolute financial independence and personal professional autonomy." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="questAntidoteInput">What should I assert to you when you attempt procrastination avoidance?</label>
+                            <textarea id="questAntidoteInput" rows="2" placeholder="e.g., Every delay is pushing your dream of financial independence out of reality." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width:100%;">Engage Strategy Algorithm</button>
+                    </form>
+                </div>
+
+                <div class="glass-panel" style="display:flex; gap:1rem; flex-wrap:wrap;">
+                    <button class="btn btn-danger" id="emergencyOverwhelmedTriggerBtn" style="flex:1;">I'm Overwhelmed</button>
+                    <button class="btn btn-secondary" id="talkToAiGuideTriggerBtn">Talk to AI Guide Voice</button>
+                </div>
+
+            </div>
+
+            <div class="right-column-viewports" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <div class="glass-panel">
+                    <div class="card-header-title">
+                        <span>Active Quests Registry Log</span>
+                        <span id="activeQuestCounterLabel" style="font-size:0.8rem; color:var(--text-secondary);">0 Active</span>
+                    </div>
+                    
+                    <div id="questBoardLoadingIndicator" class="hidden" style="text-align:center; padding:2rem; color:var(--text-secondary);">
+                        <div style="margin-bottom:0.5rem;">Running predictive analysis calculations via Gemini core engine arrays...</div>
+                    </div>
+
+                    <div class="quests-container" id="globalActiveQuestsBoardContainer">
+                        <div id="emptyQuestBoardPlaceholder" style="text-align:center; padding:4rem 0; color:var(--text-muted); font-size:0.95rem;">
+                            No active quests configured in this system cycle. Configure an operational log objective to deploy.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel">
+                    <div class="card-header-title">Unlocked Achievements Matrix</div>
+                    <div id="achievementsGridListContainer" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:0.75rem;">
+                    </div>
+                </div>
+
+                <div class="glass-panel">
+                    <div class="card-header-title">Daily Tactical Analytics Report</div>
+                    <div id="dailyPerformanceReportDisplayBox" style="font-size:0.9rem; line-height:1.5; color:#cbd5e1;">
+                        Complete an active quest processing segment to generate validation parameters for this operational sub-cycle dashboard view.
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="modal-overlay" id="globalRewardNotificationModalSystemOverlay">
+        <div class="modal-box">
+            <div style="font-size: 3rem; margin-bottom: 0.5rem;">🏆</div>
+            <div class="reward-title" id="rewardModalPrimaryHeading">QUEST COMPLETED</div>
+            <div id="rewardModalXpSubheading" style="font-size: 1.3rem; font-weight: bold; margin-bottom: 1rem; color: var(--neon-cyan);">+500 XP GAINED</div>
+            <p id="rewardModalAchievementText" style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;">System Milestone Badge Unlocked!</p>
+            <button class="btn btn-primary" id="dismissModalRewardActionButton" style="min-width: 120px;">Acknowledge</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="globalQuestReminderOperationalModalSystemOverlay">
+        <div class="modal-box" style="border-color: var(--neon-cyan);">
+            <div style="font-size: 3rem; margin-bottom: 0.5rem;">⏰</div>
+            <div class="reward-title" style="background:linear-gradient(90deg, var(--neon-cyan), var(--neon-indigo)); -webkit-background-clip:text;" id="reminderModalQuestHeaderTitle">QUEST ENGAGEMENT TARGET</div>
+            <p id="reminderModalWindowSubtitle" style="font-size: 1.1rem; margin-bottom: 1rem; color: white; font-weight:600;">Focus Block Session Active Window</p>
+            <div id="reminderPersonalMotivationDisplayBlock" style="background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.1); border-radius:8px; padding:0.75rem; margin-bottom:1.5rem; font-size:0.9rem; font-style:italic; color: #cbd5e1;">
+                "Your registered focus parameters motivation statement text will render inside this container."
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center;" id="reminderActionsButtonContainer">
+                <button class="btn btn-primary" id="reminderStartQuestActionBtn">Start Quest</button>
+                <button class="btn btn-secondary" id="reminderSnoozeQuestActionBtn">Snooze 10m</button>
+                <button class="btn btn-danger" id="reminderDismissQuestActionBtn">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================================
+        // INITIAL GLOBAL STATE SYSTEM LOGIC DATA STORES ARCHITECTURE MANAGEMENT
+        // =========================================================================
+        let state = {
+            xp: 0,
+            level: 1,
+            rank: "E RANK",
+            currentStreak: 0,
+            bestStreak: 0,
+            quests: [],
+            failedQuests: [],
+            activityLog: [],
+            totalSnoozes: 0,
+            totalIgnores: 0,
+            focusTimeMinutes: 0,
+            achievements: [],
+            totalCompletedCount: 0,
+            totalIgnoredCount: 0,
+            lastCompletionDateStr: "",
+            voiceMemory: []
+        };
+
+        const RANK_THRESHOLD = 1000; 
+
+        const ACHIEVEMENT_DEFINITIONS = {
+            "first-quest": { id: "first-quest", title: "First Quest Completed", desc: "Initiated your operational baseline trajectory tracker parameters.", unlocked: false },
+            "streak-7": { id: "streak-7", title: "7 Day Streak Warrior", desc: "Maintained processing consistency for 7 operational cycles.", unlocked: false },
+            "streak-30": { id: "streak-30", title: "30 Day Streak Master", desc: "Unmatched operational mastery spanning 30 operational milestones.", unlocked: false },
+            "focus-warrior": { id: "focus-warrior", title: "Focus Warrior Elite", desc: "Executed a high risk or boss fight vanguard quest calculation successfully.", unlocked: false },
+            "discipline-builder": { id: "discipline-builder", title: "Discipline Builder", desc: "Completed 5 target tasks successfully without trigger drop errors.", unlocked: false },
+            "quest-master": { id: "quest-master", title: "Quest Master Sovereign", desc: "Completed 10 comprehensive systemic objective quest modules.", unlocked: false }
+        };
+
+        // =========================================================================
+        // LOCAL STORAGE ENGINE LIFECYCLE MANAGEMENT IMPLEMENTATION PIPELINE DATA
+        // =========================================================================
+        function initializeSystemLoadState() {
+            const preservedData = localStorage.getItem("FOCUS_HUNTER_STATE");
+            const preservedKey = localStorage.getItem("FOCUS_HUNTER_KEY");
+            
+            if (preservedKey) {
+                document.getElementById('globalKeyField').value = preservedKey;
+            }
+
+            if (preservedData) {
+                try {
+                    const parsed = JSON.parse(preservedData);
+                    state = { ...state, ...parsed };
+                } catch(e) {
+                    console.error("Local storage corruption dropped state registers resetting configurations.", e);
+                }
+            }
+            
+            if (!state.quests) state.quests = [];
+            if (!state.failedQuests) state.failedQuests = [];
+            if (!state.activityLog) state.activityLog = [];
+            if (!state.totalSnoozes) state.totalSnoozes = 0;
+            if (!state.totalIgnores) state.totalIgnores = 0;
+            if (!state.focusTimeMinutes) state.focusTimeMinutes = 0;
+            if (!state.achievements) state.achievements = [];
+            if (!state.voiceMemory) state.voiceMemory = [];
+            
+            evaluateStreakLifecycleState();
+            renderCoreDashboardHUD();
+            renderActiveQuestsLogBoard();
+            renderAchievementsGridMatrix();
+            generateDailyPerformanceAnalyticalReport();
+            requestNotificationPermission();
+
+            // Run system timeline checker loop
+            setInterval(() => {
+                runSystemHeartbeatCycle();
+            }, 10000);
+        }
+
+        function saveSystemCurrentState() {
+            localStorage.setItem("FOCUS_HUNTER_STATE", JSON.stringify(state));
+            const currentKeyVal = document.getElementById('globalKeyField').value.trim();
+            localStorage.setItem("FOCUS_HUNTER_KEY", currentKeyVal);
+        }
+
+        function retrieveValidatedApiKey() {
+            return document.getElementById('globalKeyField').value.trim();
+        }
+
+        // =========================================================================
+        // AUTOMATED REWARD PROGRESSION RANK ENGINE SYSTEMS CALCULATIONS LOOPS
+        // =========================================================================
+        function injectEarnedRewardXp(amount) {
+            state.xp += amount;
+            let levelUpsGained = 0;
+            
+            while (state.xp >= RANK_THRESHOLD) {
+                state.xp -= RANK_THRESHOLD;
+                state.level += 1;
+                levelUpsGained++;
+            }
+
+            if (state.level >= 25) state.rank = "S RANK";
+            else if (state.level >= 18) state.rank = "A RANK";
+            else if (state.level >= 12) state.rank = "B RANK";
+            else if (state.level >= 7) state.rank = "C RANK";
+            else if (state.level >= 3) state.rank = "D RANK";
+            else state.rank = "E RANK";
+
+            saveSystemCurrentState();
+            renderCoreDashboardHUD();
+            return levelUpsGained;
+        }
+
+        function evaluateStreakLifecycleState() {
+            if (!state.lastCompletionDateStr) return;
+            
+            const todayStr = new Date().toDateString();
+            const lastDate = new Date(state.lastCompletionDateStr);
+            const todayDate = new Date(todayStr);
+            
+            const differenceInTime = todayDate.getTime() - lastDate.getTime();
+            const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
+            
+            if (differenceInDays > 1) {
+                state.currentStreak = 0; 
+                saveSystemCurrentState();
+            }
+        }
+
+        function registerQuestCompletionStreakIncremental() {
+            const todayStr = new Date().toDateString();
+            
+            if (state.lastCompletionDateStr !== todayStr) {
+                if (state.lastCompletionDateStr === new Date(Date.now() - 86400000).toDateString()) {
+                    state.currentStreak += 1;
+                } else if (!state.lastCompletionDateStr || state.currentStreak === 0) {
+                    state.currentStreak = 1;
+                }
+                
+                if (state.currentStreak > state.bestStreak) {
+                    state.bestStreak = state.currentStreak;
+                }
+                state.lastCompletionDateStr = todayStr;
+            }
+            
+            state.totalCompletedCount += 1;
+            evaluateAchievementMatrixUnlockCriteria();
+            saveSystemCurrentState();
+        }
+
+        function evaluateAchievementMatrixUnlockCriteria() {
+            let newlyUnlocked = [];
+
+            function authorizeUnlock(id) {
+                if (!state.achievements.includes(id)) {
+                    state.achievements.push(id);
+                    newlyUnlocked.push(ACHIEVEMENT_DEFINITIONS[id].title);
+                }
+            }
+
+            if (state.totalCompletedCount >= 1) authorizeUnlock("first-quest");
+            if (state.currentStreak >= 7) authorizeUnlock("streak-7");
+            if (state.currentStreak >= 30) authorizeUnlock("streak-30");
+            if (state.totalCompletedCount >= 5) authorizeUnlock("discipline-builder");
+            if (state.totalCompletedCount >= 10) authorizeUnlock("quest-master");
+
+            return newlyUnlocked;
+        }
+
+        function logActivityEvent(text) {
+            state.activityLog.push({
+                timestamp: Date.now(),
+                text: text
+            });
+            if (state.activityLog.length > 100) state.activityLog.shift();
+            saveSystemCurrentState();
+            generateDailyPerformanceAnalyticalReport();
+        }
+
+        function requestNotificationPermission() {
+            if ("Notification" in window && Notification.permission === "default") {
+                Notification.requestPermission();
+            }
+        }
+
+        // =========================================================================
+        // HIGHLY DETAILED CONTEXT-AWARE LOCAL BACKUP GENERATOR FACTORY
+        // =========================================================================
+        function generateSmartLocalTaskPlanFallback(title, hours) {
+            const t = title.toLowerCase();
+            let subQuests = [];
+            let strategyOverview = "";
+            let recommendedFocusSessions = "";
+            let emergencySurvivalPlan = "";
+
+            if (t.includes("sql mock") || t.includes("sql test") || t.includes("sql query")) {
+                subQuests = [
+                    "Isolate and test INNER, OUTER, LEFT, and FULL complex joins",
+                    "Construct analytical window functions using ROW_NUMBER, RANK, and DENSE_RANK",
+                    "Solve 5 production-grade mock question schemas from database environments",
+                    "Debug logical execution order syntax issues and syntax error parameters"
+                ];
+                strategyOverview = "Systematically map out complex relational database entity schemas before query generation. Focus strictly on maximizing indexing optimization and avoiding performance-heavy nested loop subqueries.";
+                recommendedFocusSessions = `Allocate ${hours} hours into specific sub-topic segments: Segment 1 (40%) isolates advanced set joins and predicates; Segment 2 (40%) targets data windowing edge cases; Segment 3 (20%) is reserved exclusively for syntax error review.`;
+                emergencySurvivalPlan = "Strip the active query down to its raw components. Delete all complex joins and WHERE filter clauses. Re-append predicates line-by-line until the runtime failure surfaces.";
+            } 
+            else if (t.includes("interview") || t.includes("data analytics interview")) {
+                subQuests = [
+                    "Whiteboard complex multi-table SQL group aggregations",
+                    "Debug data manipulation scripts using Pandas data-frames",
+                    "Optimize visualization rendering metrics inside Power BI model layers",
+                    "Verify core descriptive and inferential statistical equations",
+                    "Rehearse behavioral interview transcripts using the STAR framework"
+                ];
+                strategyOverview = "Synthesize syntax requirements with high-level business interpretation. When speaking to stakeholders, explicitly link abstract technical database optimizations directly to actionable corporate revenue impacts.";
+                recommendedFocusSessions = `Divide the ${hours}-hour block into sharp domain sprints: Spend 30% on analytical programming configurations, 30% on dashboard architecture, 20% on statistical definitions, and 20% on mock communication loops.`;
+                emergencySurvivalPlan = "Immediately stop reviewing general theory. Open a local text file and write out exactly two concrete business impact logs from past experiences using the metric-driven STAR layout.";
+            } 
+            else if (t.includes("hackathon") || t.includes("build sprint") || t.includes("mvp")) {
+                subQuests = [
+                    "Define feature scoping constraints and map system wireframe paths",
+                    "Initialize component asset directories and layout UI theme constants",
+                    "Code primary functional endpoints and configure database migrations",
+                    "Run end-to-end user path validations and system integration tests",
+                    "Assemble a 3-minute video presentation deck and feature product demo"
+                ];
+                strategyOverview = "Maintain a strict minimal viable product posture throughout the build phase. Intentionally accumulate clean technical debt in secondary layers to keep the core user authentication and data flows operational.";
+                recommendedFocusSessions = `Distribute the ${hours}-hour allocation into hyper-focused 60-minute blocks: Block 1 forces architectural lock; Blocks 2-3 freeze the backend pipeline APIs; Block 4 isolates integration failures.`;
+                emergencySurvivalPlan = "Drop the broken optional feature immediately. Comment out non-essential code parameters or UI modules, ensure the application builds successfully, and run a baseline demo.";
+            } 
+            else if (t.includes("weight") || t.includes("loss") || t.includes("diet") || t.includes("workout") || t.includes("fitness")) {
+                subQuests = [
+                    "Calculate precise daily metabolic baseline macronutrient distribution parameters",
+                    "Establish a highly structured high-intensity strength training protocol",
+                    "Track real-time cardiorespiratory output aiming for 10k structural steps",
+                    "Audit micro-environmental sleep elements to optimize deep circadian rest",
+                    "Log fluid consumption targets using a quantitative matrix sheet"
+                ];
+                strategyOverview = "Isolate physical operational parameters by treating performance variables as a closed thermal feedback loop. Track systemic consistency across tracking cycles rather than looking at localized daily weight fluctuations.";
+                recommendedFocusSessions = `Structure the ${hours}-hour management block into actionable sections: 30 minutes for quantitative meal tracking preparation, 60 minutes for targeted structural physical strain, and 15 minutes for validation logging.`;
+                emergencySurvivalPlan = "If mental fatigue or environmental friction disrupts execution, put on your shoes, step outside, and walk continuously in one direction for 5 minutes without tracking speed.";
+            } 
+            else {
+                subQuests = [
+                    `Research foundational requirements for ${title}`,
+                    `Isolate dependencies and establish environment parameters`,
+                    `Execute the primary high-friction technical production sprint`,
+                    `Review implementation logs and isolate structural errors`,
+                    `Verify final output metrics against intended functional benchmarks`
+                ];
+                strategyOverview = `Deconstruct the complex operational criteria of "${title}" into atomic dependencies. Isolate technical assumptions as early as possible to prevent execution paralysis during execution phases.`;
+                recommendedFocusSessions = `Distribute the ${hours} hours evenly across domain checkpoints: Set a 20% time window for discovery mapping, 60% for isolated high-friction production tasks, and 20% for verification debugging.`;
+                emergencySurvivalPlan = "Close all peripheral communication tools and browse windows. Open a blank notepad, write out a single sentence explaining the exact logic blocker, and execute a single line of functional code.";
+            }
+
+            return {
+                priorityScore: "85/100 (Local Matrix)",
+                riskLevel: "MODERATE CHAFE",
+                completionProbability: "75%",
+                strategyOverview,
+                microQuests: subQuests,
+                recommendedFocusSessions,
+                emergencySurvivalPlan
+            };
+        }
+
+        // =========================================================================
+        // NATIVE REST API INTEGRATION INTERFACE PROMPT BUILDER PIPELINE CORE
+        // =========================================================================
+        async function requestGeminiModelAnalysis(questPayloadObject) {
+            const key = retrieveValidatedApiKey();
+            if (!key) {
+                return new Promise((resolve) => {
+                    const fallbackData = generateSmartLocalTaskPlanFallback(questPayloadObject.name, questPayloadObject.hours);
+                    resolve(fallbackData);
+                });
+            }
+
+            const endpointUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`;
+            
+            const structuralPrompt = `
+                You are the AI System Core Engine inside "Focus Hunter AI", a premium gamified RPG accountability system software application.
+                Analyze this newly logged operational quest submission parameters text:
+                - Quest Name: "${questPayloadObject.name}"
+                - Combat Difficulty Tier Stated: "${questPayloadObject.difficulty}"
+                - Target Execution Time Frame Allocation: "${questPayloadObject.hours} hours"
+                - Stated Timeline Target Deadline Boundary: "${questPayloadObject.deadline}"
+                - Core Stated Personal Motivation Vector: "${questPayloadObject.purpose}"
+                - Anti-Procrastination Remediation Instruction Target: "${questPayloadObject.antidote}"
+                - Current Temporal Time Marker Clock String: "${new Date().toLocaleString()}"
+
+                CRITICAL CRITERIA FOR DATA GENERATION:
+                1. "microQuests": Generate custom, highly task-specific item names. If the title involves SQL, include entries like "SQL joins", "Window functions", or "Mock questions". If an interview, target specific toolsets, statistics, or HR components. If a hackathon, detail specific architectural phases (Planning, Design, Development, Testing, Presentation). Never use abstract phase names.
+                2. "strategyOverview": Provide a hyper-targeted, functional technical approach strategy detailing exactly how the user should construct, manage, or study for this specific domain. Avoid all generic lifestyle advice.
+                3. "recommendedFocusSessions": Map out the user's input time (${questPayloadObject.hours} hours) into specific, topic-driven deep work segments explicitly detailing which technical elements or sub-topics to master in each chronological sequence.
+                4. "emergencySurvivalPlan": Generate an immediate, practical, task-specific troubleshooting recovery action plan for when the user encounters technical blocks or execution paralysis. This must be an actionable, step-by-step diagnostic or physical procedure custom-tailored to the nature of the specific task. Absolutely avoid generic motivational text, empty platitudes, or abstract placeholder statements.
+
+                Generate structural strategic analytical breakdown response parameters matching this schema layout definition.
+                Return ONLY raw JSON conforming exactly to this structure:
+                {
+                    "priorityScore": "A numerical scaling evaluate value string out of 100 (e.g., '88/100')",
+                    "riskLevel": "Categorize exactly into one single tag: 'LOW RISK', 'MODERATE CHAFE', 'HIGH RISK', or 'EXTREME CRUNCH'",
+                    "completionProbability": "Percentage estimation tracking metrics string (e.g., '72%')",
+                    "strategyOverview": "A highly granular, technical strategy blueprint summarizing exactly how to architect and navigate this specific domain or project without falling into avoidance trap loops.",
+                    "microQuests": [
+                        "Granular item task 1 description title string",
+                        "Granular item task 2 description title string",
+                        "Granular item task 3 description title string",
+                        "Granular item task 4 description title string",
+                        "Granular item task 5 description title string"
+                    ],
+                    "recommendedFocusSessions": "A topic-driven chronological breakdown mapping the allocated hours directly onto specific technical sub-topics and session modules.",
+                    "emergencySurvivalPlan": "A concrete, step-by-step diagnostic or functional action path to force immediate task-specific momentum when encountering a mental block."
+                }
+            `;
+
+            const outboundBody = {
+                contents: [{
+                    parts: [{ text: structuralPrompt }]
+                }],
+                generationConfig: {
+                    responseMimeType: "application/json"
+                }
+            };
+
+            const response = await fetch(endpointUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(outboundBody)
+            });
+
+            if (!response.ok) {
+                const textErr = await response.text();
+                throw new Error(`HTTP Error Status Level [${response.status}]: ${textErr}`);
+            }
+
+            const dataParsed = await response.json();
+            const textResponseRaw = dataParsed.candidates[0].content.parts[0].text.trim();
+            return JSON.parse(textResponseRaw);
+        }
+
+        async function requestGeminiCoachingMessage(contextPromptDetailsText) {
+            const key = retrieveValidatedApiKey();
+            if (!key) return "System online. Standing by to optimize your performance tracking parameters.";
+
+            const endpointUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`;
+            
+            const behavioralPrompt = `
+                You are the AI Guide Mentor inside the Focus Hunter RPG task platform application software.
+                Provide an inspiring, psychologically grounded, highly supportive coaching address targeting this situation context:
+                "${contextPromptDetailsText}"
+                
+                Keep your output block response short, max 3 sentences. Address the user directly as "Hunter". Use a motivating, deep tone. Never shame the user. Keep it brief. Do not repeat typical systemic idioms.
+            `;
+
+            try {
+                const response = await fetch(endpointUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: behavioralPrompt }] }]
+                    })
+                });
+                if (!response.ok) return "Hunter, the paths ahead require clean execution. Let's begin immediately without delay.";
+                const resJson = await response.json();
+                return resJson.candidates[0].content.parts[0].text.trim();
+            } catch(e) {
+                return "Hunter, data fluxes intercepted the transmission. Refocus your energy array and deploy your intent now.";
+            }
+        }
+
+        // =========================================================================
+        // DOM RENDERING ENGINE GRAPHICAL INTERFACE OPERATIONS ARCHITECTURE PIPELINE
+        // =========================================================================
+        function renderCoreDashboardHUD() {
+            document.getElementById('hudRank').innerText = state.rank;
+            document.getElementById('hudStreak').innerText = `🔥 ${state.currentStreak} DAYS`;
+            document.getElementById('hudLevelVal').innerText = `LV ${state.level}`;
+            document.getElementById('hudXpLabel').innerText = `LEVEL EXP: ${state.xp} / ${RANK_THRESHOLD}`;
+            
+            const fillPct = (state.xp / RANK_THRESHOLD) * 100;
+            document.getElementById('hudXpFill').style.width = `${fillPct}%`;
+            
+            let redAlertActiveGlobalFlag = false;
+            const nowTime = new Date().getTime();
+            
+            state.quests.forEach(q => {
+                const targetDiffTime = q.deadlineTime - nowTime;
+                if (targetDiffTime > 0 && targetDiffTime <= 86400000) {
+                    redAlertActiveGlobalFlag = true;
+                }
+            });
+
+            const bodyEl = document.body;
+            const bannerEl = document.getElementById('redAlertGlobalBanner');
+            if (redAlertActiveGlobalFlag) {
+                bodyEl.classList.add('red-alert-active');
+                bannerEl.style.display = 'block';
+            } else {
+                bodyEl.classList.remove('red-alert-active');
+                bannerEl.style.display = 'none';
+            }
+        }
+
+        function renderAchievementsGridMatrix() {
+            const container = document.getElementById('achievementsGridListContainer');
+            container.innerHTML = '';
+            
+            Object.keys(ACHIEVEMENT_DEFINITIONS).forEach(key => {
+                const achObj = ACHIEVEMENT_DEFINITIONS[key];
+                const isUnlocked = state.achievements.includes(key);
+                
+                const box = document.createElement('div');
+                box.className = 'ai-pill';
+                box.style.opacity = isUnlocked ? "1" : "0.35";
+                box.style.border = isUnlocked ? "1px solid var(--neon-cyan)" : "1px solid rgba(255,255,255,0.05)";
+                box.style.boxShadow = isUnlocked ? "0 0 10px rgba(6, 182, 212, 0.15)" : "none";
+                
+                box.innerHTML = `
+                    <div style="font-size:1.3rem; margin-bottom:0.25rem;">${isUnlocked ? "🔹" : "🔒"}</div>
+                    <div class="ai-pill-value" style="font-size:0.75rem; line-height:1.2;">${achObj.title}</div>
+                    <div style="font-size:0.65rem; color:var(--text-secondary); margin-top:0.2rem; line-height:1.1;">${achObj.desc}</div>
+                `;
+                container.appendChild(box);
+            });
+        }
+
+        function renderActiveQuestsLogBoard() {
+            const container = document.getElementById('globalActiveQuestsBoardContainer');
+            const placeholder = document.getElementById('emptyQuestBoardPlaceholder');
+            
+            const clearTargets = container.querySelectorAll('.quest-card');
+            clearTargets.forEach(el => el.remove());
+
+            document.getElementById('activeQuestCounterLabel').innerText = `${state.quests.length} Active`;
+
+            if (state.quests.length === 0) {
+                placeholder.classList.remove('hidden');
+                return;
+            } else {
+                placeholder.classList.add('hidden');
+            }
+
+            state.quests.forEach((quest, questIdx) => {
+                const card = document.createElement('div');
+                
+                const timeLeftMs = quest.deadlineTime - new Date().getTime();
+                const isCriticalAlertWindow = (timeLeftMs > 0 && timeLeftMs <= 86400000);
+                
+                card.className = `quest-card ${isCriticalAlertWindow ? 'priority-alert' : ''}`;
+                
+                let subQuestsLayoutHtml = '';
+                if (quest.aiData && quest.aiData.microQuests) {
+                    subQuestsLayoutHtml = `<div class="sub-quests-wrapper">`;
+                    quest.aiData.microQuests.forEach((subName, subIdx) => {
+                        const uniqueId = `check_${quest.id}_${subIdx}`;
+                        const isChecked = quest.completedSubQuests && quest.completedSubQuests.includes(subIdx);
+                        
+                        subQuestsLayoutHtml += `
+                            <div class="sub-quest-item ${isChecked ? 'completed' : ''}">
+                                <input type="checkbox" id="${uniqueId}" ${isChecked ? 'checked' : ''} onchange="toggleSubQuestExecutionState('${quest.id}', ${subIdx})">
+                                <label for="${uniqueId}" style="margin-bottom:0; text-transform:none; font-weight:normal; color:inherit; cursor:pointer;">${subName}</label>
+                            </div>
+                        `;
+                    });
+                    subQuestsLayoutHtml += `</div>`;
+                }
+
+                let aiAnalysisPanelHtml = '';
+                if (quest.aiData) {
+                    aiAnalysisPanelHtml = `
+                        <div class="ai-analysis-drawer">
+                            <div class="ai-analysis-grid-metrics">
+                                <div class="ai-pill">
+                                    <div class="ai-pill-label">Priority Score</div>
+                                    <div class="ai-pill-value" style="color:var(--neon-purple);">${quest.aiData.priorityScore || 'N/A'}</div>
+                                </div>
+                                <div class="ai-pill">
+                                    <div class="ai-pill-label">Risk Level</div>
+                                    <div class="ai-pill-value" style="color:var(--emergency-red); font-size:0.75rem;">${quest.aiData.riskLevel || 'N/A'}</div>
+                                </div>
+                                <div class="ai-pill">
+                                    <div class="ai-pill-label">Win Odds</div>
+                                    <div class="ai-pill-value" style="color:#10b981;">${quest.aiData.completionProbability || 'N/A'}</div>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0.75rem;">
+                                <label style="font-size:0.65rem; color:var(--neon-cyan);">Tactical Focus Session Track</label>
+                                <div style="font-size:0.8rem; color:#cbd5e1;">${quest.aiData.recommendedFocusSessions || 'Standard blocking.'}</div>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0.75rem;">
+                                <label style="font-size:0.65rem; color:var(--neon-purple);">System Strategy Overview</label>
+                                <div class="ai-strategy-text-block" style="font-size:0.8rem;">${quest.aiData.strategyOverview || 'No data processing metrics available.'}</div>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label style="font-size:0.65rem; color:var(--emergency-red);">Emergency Survival Protocol</label>
+                                <div style="font-size:0.8rem; color:#f87171; border-left:2px solid var(--emergency-red); padding-left:0.5rem; font-style:italic;">"${quest.aiData.emergencySurvivalPlan || 'Initiate baseline engagement tracks.'}"</div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="quest-header-row">
+                        <div>
+                            <div class="quest-title-text">${quest.name}</div>
+                            <div class="quest-meta-info" style="margin-top:0.4rem;">
+                                <span>Tiers: <strong style="text-transform:uppercase; color:var(--neon-cyan);">${quest.difficulty}</strong></span>
+                                <span>Allocation: <strong>${quest.hours} Hrs</strong></span>
+                                <span>Target Line: <strong style="color:#cbd5e1;">${new Date(quest.deadlineTime).toLocaleString()}</strong></span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" style="padding:0.4rem 0.75rem; font-size:0.75rem; background:#10b981; border:none; color:white;" onclick="triggerAbsoluteQuestResolution('${quest.id}')">Claim Victory</button>
+                    </div>
+                    
+                    ${subQuestsLayoutHtml}
+                    ${aiAnalysisPanelHtml}
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function generateDailyPerformanceAnalyticalReport() {
+            const displayBox = document.getElementById('dailyPerformanceReportDisplayBox');
+            
+            let totalActiveWeightHours = 0;
+            state.quests.forEach(q => totalActiveWeightHours += parseFloat(q.hours || 0));
+
+            const completedVolume = state.totalCompletedCount || 0;
+            const failedVolume = state.failedQuests ? state.failedQuests.length : 0;
+            const absoluteTotal = completedVolume + failedVolume;
+            const completionRatePct = absoluteTotal > 0 ? Math.round((completedVolume / absoluteTotal) * 100) : 0;
+            const procrastinationCompositeScore = (state.totalSnoozes * 4) + (state.totalIgnores * 8);
+
+            let logsContentHtml = '<div style="margin-top: 0.75rem; max-height: 140px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">';
+            if (!state.activityLog || state.activityLog.length === 0) {
+                logsContentHtml += `<div style="font-size:0.8rem; color:var(--text-muted); text-align:center; padding:1rem;">No tactical activity historical points logged.</div>`;
+            } else {
+                const chronologicalLogs = [...state.activityLog].reverse().slice(0, 20);
+                chronologicalLogs.forEach(entry => {
+                    const timeStr = new Date(entry.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+                    logsContentHtml += `<div style="font-size:0.78rem; margin-bottom:0.3rem; color:#cbd5e1; border-left:2px solid var(--neon-cyan); padding-left:0.5rem;">
+                        <span style="color:var(--text-muted); font-size:0.68rem; margin-right:0.25rem;">[${timeStr}]</span> ${entry.text}
+                    </div>`;
+                });
+            }
+            logsContentHtml += '</div>';
+
+            displayBox.innerHTML = `
+                <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; margin-bottom:1rem;">
+                    <div class="ai-pill"><div class="ai-pill-label">Success/Completion Rate</div><div class="ai-pill-value" style="color:#10b981;">${completionRatePct}%</div></div>
+                    <div class="ai-pill"><div class="ai-pill-label">Procrastination Score</div><div class="ai-pill-value" style="color:var(--emergency-red);">${procrastinationCompositeScore}</div></div>
+                    <div class="ai-pill"><div class="ai-pill-label">Snoozes / Ignores</div><div class="ai-pill-value" style="color:#f59e0b; font-size:0.85rem;">${state.totalSnoozes} Snooze / ${state.totalIgnores} Ign</div></div>
+                    <div class="ai-pill"><div class="ai-pill-label">Total Focus Time</div><div class="ai-pill-value" style="color:var(--neon-cyan); font-size:0.85rem;">${state.focusTimeMinutes} Min</div></div>
+                </div>
+                <p style="margin-bottom:0.5rem; font-size:0.85rem;">Current Processing Backlog Volumetric Weight: <strong>${totalActiveWeightHours} Projected Hours</strong></p>
+                
+                <label style="font-size:0.72rem; color:var(--neon-purple); display:block; margin-top:0.75rem; font-weight:700; letter-spacing:0.5px;">DYNAMIC CRITICAL ACTIVITY ENGINE LOG</label>
+                ${logsContentHtml}
+            `;
+        }
+
+        // =========================================================================
+        // SMART REMINDER TIMELINE INTERVENTIONS & FAILURE DETECTION ENGINE DETECTORS
+        // =========================================================================
+        function runSystemHeartbeatCycle() {
+            const rightNow = Date.now();
+            let stateMutatedFlag = false;
+
+            state.quests.forEach((quest) => {
+                if (quest.remindersScheduled) {
+                    quest.remindersScheduled.forEach((reminder) => {
+                        if (rightNow >= reminder.time && !reminder.triggered) {
+                            reminder.triggered = true;
+                            stateMutatedFlag = true;
+                            deploySystemTriggeredReminder(quest, reminder.type);
+                        }
+                    });
+                }
+
+                if (rightNow >= quest.deadlineTime && !quest.isFailed) {
+                    stateMutatedFlag = true;
+                    deployQuestFailureProtocol(quest);
+                }
+            });
+
+            if (stateMutatedFlag) {
+                saveSystemCurrentState();
+                renderCoreDashboardHUD();
+                renderActiveQuestsLogBoard();
+                generateDailyPerformanceAnalyticalReport();
+            }
+        }
+
+        function deploySystemTriggeredReminder(quest, typeLabel) {
+            const msg = `Quest Alert Tracker [${typeLabel}] triggered for objective: "${quest.name}"`;
+            
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification("FOCUS HUNTER AI CHRONO REMINDER", {
+                    body: msg,
+                    icon: "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22 width=%22100%22 height=%22100%22><text y=%220.9em%22 font-size=%2290%22>⏰</text></svg>"
+                });
+            }
+
+            logActivityEvent(`Fired timeline reminder alert (${typeLabel}) for "${quest.name}"`);
+            launchActiveQuestReminderDisplayOverlay(quest, typeLabel);
+        }
+
+        function setupReminderModalButtons(modeType, assignedId) {
+            const container = document.getElementById('reminderActionsButtonContainer');
+            if (modeType === 'alert') {
+                container.innerHTML = `
+                    <button class="btn btn-primary" onclick="handleReminderModalActionClick('start', '${assignedId}')">Start Quest</button>
+                    <button class="btn btn-secondary" onclick="handleReminderModalActionClick('snooze', '${assignedId}')">Snooze 10m</button>
+                    <button class="btn btn-danger" onclick="handleReminderModalActionClick('dismiss', '${assignedId}')">Dismiss</button>
+                `;
+            } else if (modeType === 'failure') {
+                container.innerHTML = `
+                    <button class="btn btn-primary" style="background:linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-indigo) 100%);" onclick="handleReminderModalActionClick('restart', '${assignedId}')">Restart Quest</button>
+                    <button class="btn btn-danger" onclick="handleReminderModalActionClick('abandon', '${assignedId}')">Abandon It</button>
+                `;
+            }
+        }
+
+        function launchActiveQuestReminderDisplayOverlay(questObjectRef, reminderType) {
+            const modal = document.getElementById('globalQuestReminderOperationalModalSystemOverlay');
+            document.getElementById('reminderModalQuestHeaderTitle').innerText = `QUEST ENGAGEMENT CHRONO ALERT`;
+            document.getElementById('reminderModalWindowSubtitle').innerText = `${questObjectRef.name} (${reminderType || 'Active Tracker'})`;
+            
+            let responseInterventionBlockText = `Why this matters to you: "${questObjectRef.purpose || 'No target data logged.'}"`;
+            const currentIgnoreCounterVal = questObjectRef.ignoreRemindersCounter || 0;
+
+            if (currentIgnoreCounterVal === 1) {
+                responseInterventionBlockText = `⚠️ [PROCRASTINATION INTERVENTION LEVEL 1] - Asserting Target Parameters: "${questObjectRef.antidote || 'No defense instruction logged.'}"`;
+            } else if (currentIgnoreCounterVal === 2) {
+                responseInterventionBlockText = `🚨 [PROCRASTINATION INTERVENTION LEVEL 2] - "You are repeating an avoidance pattern."`;
+            } else if (currentIgnoreCounterVal === 3) {
+                responseInterventionBlockText = `🔥 [PROCRASTINATION INTERVENTION LEVEL 3] - "You are teaching your brain that discomfort should be avoided instead of conquered."`;
+            } else if (currentIgnoreCounterVal >= 4) {
+                responseInterventionBlockText = `💀 [CRITICAL PROCESS VIOLATION LEVEL 4] - "This is how dreams slowly become regrets."`;
+            }
+
+            document.getElementById('reminderPersonalMotivationDisplayBlock').innerText = responseInterventionBlockText;
+            executeSpeechSynthesisTrack(responseInterventionBlockText);
+
+            setupReminderModalButtons('alert', questObjectRef.id);
+            modal.setAttribute('data-target-quest-id', questObjectRef.id);
+            modal.classList.add('active');
+        }
+
+        function deployQuestFailureProtocol(quest) {
+            quest.isFailed = true;
+            state.quests = state.quests.filter(q => q.id !== quest.id);
+            state.failedQuests.push(quest);
+            logActivityEvent(`Failure detected: Quest "${quest.name}" missed the timeline boundary.`);
+
+            const modal = document.getElementById('globalQuestReminderOperationalModalSystemOverlay');
+            document.getElementById('reminderModalQuestHeaderTitle').innerText = `🚨 FAILURE REPORT LOG ENCOUNTERED`;
+            document.getElementById('reminderModalWindowSubtitle').innerText = quest.name;
+
+            const totalRemindersIgnored = quest.ignoreCount || 0;
+            const totalSnoozes = quest.snoozeCount || 0;
+            const timeWasted = quest.hours || 0;
+
+            const structuredReportText = `[CRITICAL TIMELINE BOUNDARY EXPIRED]\n\n• Total Reminders Ignored: ${totalRemindersIgnored}\n• Total Snoozes Registered: ${totalSnoozes}\n• Estimated Investment Time Wasted: ${timeWasted} Hours\n• Original Goal Statement: "${quest.purpose}"\n• Motivation Vector Antidote: "${quest.antidote}"\n\nDo you want to restart this quest or abandon it?`;
+
+            document.getElementById('reminderPersonalMotivationDisplayBlock').innerText = structuredReportText;
+            executeSpeechSynthesisTrack(`Hunter, the deadline for your quest ${quest.name} has passed without verification. Analyze the failure report parameters now.`);
+
+            setupReminderModalButtons('failure', quest.id);
+            modal.setAttribute('data-target-quest-id', quest.id);
+            modal.classList.add('active');
+        }
+
+        window.handleReminderModalActionClick = function(actionTag, queryId) {
+            const modal = document.getElementById('globalQuestReminderOperationalModalSystemOverlay');
+            
+            let matchedQuest = state.quests.find(q => q.id === queryId);
+            if (!matchedQuest) matchedQuest = state.failedQuests.find(q => q.id === queryId);
+
+            if (!matchedQuest) {
+                modal.classList.remove('active');
+                return;
+            }
+
+            if (actionTag === 'start') {
+                matchedQuest.ignoreRemindersCounter = 0;
+                logActivityEvent("Focus Session Engagement Confirmed for " + matchedQuest.name);
+                executeSpeechSynthesisTrack("Combat engagement confirmed. Focus field matrix locked active. Go win this fight, Hunter.");
+                modal.classList.remove('active');
+            } 
+            else if (actionTag === 'snooze') {
+                matchedQuest.ignoreRemindersCounter = (matchedQuest.ignoreRemindersCounter || 0) + 1;
+                matchedQuest.snoozeCount = (matchedQuest.snoozeCount || 0) + 1;
+                state.totalSnoozes += 1;
+                
+                if (matchedQuest.remindersScheduled) {
+                    matchedQuest.remindersScheduled.forEach(rem => {
+                        rem.time += 10 * 60 * 1000;
+                        if (rem.time > Date.now()) rem.triggered = false;
+                    });
+                }
+                matchedQuest.deadlineTime += 10 * 60 * 1000;
+                logActivityEvent(`Snoozed Alert tracking parameters for "${matchedQuest.name}"`);
+                modal.classList.remove('active');
+            } 
+            else if (actionTag === 'dismiss') {
+                matchedQuest.ignoreRemindersCounter = (matchedQuest.ignoreRemindersCounter || 0) + 1;
+                matchedQuest.ignoreCount = (matchedQuest.ignoreCount || 0) + 1;
+                state.totalIgnores += 1;
+                state.totalIgnoredCount += 1;
+                logActivityEvent(`Ignored Timeline Reminder for "${matchedQuest.name}"`);
+                modal.classList.remove('active');
+            } 
+            else if (actionTag === 'restart') {
+                state.failedQuests = state.failedQuests.filter(q => q.id !== queryId);
+                const originalDuration = (matchedQuest.deadlineTime && matchedQuest.createdAt) ? (matchedQuest.deadlineTime - matchedQuest.createdAt) : (60 * 60 * 1000 * 24);
+                const nowVal = Date.now();
+
+                const revivedQuest = {
+                    ...matchedQuest,
+                    id: "quest_" + Date.now() + "_" + Math.floor(Math.random()*1000),
+                    ignoreRemindersCounter: 0,
+                    snoozeCount: 0,
+                    ignoreCount: 0,
+                    isFailed: false,
+                    createdAt: nowVal,
+                    startDate: nowVal,
+                    deadlineTime: nowVal + originalDuration,
+                    remindersScheduled: [
+                        { type: "2 days before quest start date", time: nowVal - 2 * 24 * 60 * 60 * 1000, triggered: false },
+                        { type: "On quest start date", time: nowVal, triggered: false },
+                        { type: "Midpoint of quest duration", time: nowVal + (originalDuration / 2), triggered: false },
+                        { type: "2 days before deadline", time: nowVal + originalDuration - 2 * 24 * 60 * 60 * 1000, triggered: false },
+                        { type: "On deadline", time: nowVal + originalDuration, triggered: false }
+                    ]
+                };
+
+                state.quests.push(revivedQuest);
+                logActivityEvent(`Restarted Failed Quest Vector: "${matchedQuest.name}"`);
+                modal.classList.remove('active');
+            } 
+            else if (actionTag === 'abandon') {
+                logActivityEvent(`Abandoned Quest Permanently: "${matchedQuest.name}"`);
+                modal.classList.remove('active');
+            }
+
+            saveSystemCurrentState();
+            renderCoreDashboardHUD();
+            renderActiveQuestsLogBoard();
+            generateDailyPerformanceAnalyticalReport();
+        };
+
+        // =========================================================================
+        // EVENT CONTROLLERS MODAL INTERFACES INTERACTIVE CORE APPLICATION LOGIC
+        // =========================================================================
+        document.getElementById('questSubmissionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('questNameInput').value.trim();
+            const deadline = document.getElementById('questDeadlineInput').value;
+            const difficulty = document.getElementById('questDifficultySelect').value;
+            const hours = document.getElementById('questHoursInput').value;
+            const purpose = document.getElementById('questPurposeInput').value.trim();
+            const antidote = document.getElementById('questAntidoteInput').value.trim();
+
+            const timeNow = Date.now();
+            const timeTargetDeadline = new Date(deadline).getTime();
+            const fullTimeDuration = timeTargetDeadline - timeNow;
+
+            const rem1 = timeNow - 2 * 24 * 60 * 60 * 1000;
+            const rem2 = timeNow;
+            const rem3 = timeNow + (fullTimeDuration / 2);
+            const rem4 = timeTargetDeadline - 2 * 24 * 60 * 60 * 1000;
+            const rem5 = timeTargetDeadline;
+
+            const newQuestSkeleton = {
+                id: "quest_" + Date.now() + "_" + Math.floor(Math.random()*1000),
+                name, deadline, difficulty, hours, purpose, antidote,
+                completedSubQuests: [],
+                ignoreRemindersCounter: 0,
+                snoozeCount: 0,
+                ignoreCount: 0,
+                createdAt: timeNow,
+                startDate: timeNow,
+                deadlineTime: timeTargetDeadline,
+                isFailed: false,
+                remindersScheduled: [
+                    { type: "2 days before quest start date", time: rem1, triggered: false },
+                    { type: "On quest start date", time: rem2, triggered: false },
+                    { type: "Midpoint of quest duration", time: rem3, triggered: false },
+                    { type: "2 days before deadline", time: rem4, triggered: false },
+                    { type: "On deadline", time: rem5, triggered: false }
+                ]
+            };
+
+            document.getElementById('questBoardLoadingIndicator').classList.remove('hidden');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Analyzing Vector Grids...";
+
+            try {
+                const analysisResult = await requestGeminiModelAnalysis(newQuestSkeleton);
+                newQuestSkeleton.aiData = analysisResult;
+                
+                const promptFeedback = `New quest accepted, Hunter: ${name}. Priority tracking scored at ${analysisResult.priorityScore || 'nominal values'}. Keep your eye focused on the survival track.`;
+                document.getElementById('guideSpeechText').innerText = promptFeedback;
+                executeSpeechSynthesisTrack(promptFeedback);
+            } catch(error) {
+                console.error("Gemini context pipeline extraction error drop. Using baseline local fallbacks.", error);
+                newQuestSkeleton.aiData = generateSmartLocalTaskPlanFallback(name, hours);
+            } finally {
+                document.getElementById('questBoardLoadingIndicator').classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Engage Strategy Algorithm";
+            }
+
+            state.quests.push(newQuestSkeleton);
+            logActivityEvent(`Accepted New Strategic Quest Log: "${name}"`);
+            saveSystemCurrentState();
+            
+            document.getElementById('questNameInput').value = '';
+            document.getElementById('questDeadlineInput').value = '';
+            document.getElementById('questHoursInput').value = '';
+            document.getElementById('questPurposeInput').value = '';
+            document.getElementById('questAntidoteInput').value = '';
+
+            renderCoreDashboardHUD();
+            renderActiveQuestsLogBoard();
+            generateDailyPerformanceAnalyticalReport();
+        });
+
+        window.toggleSubQuestExecutionState = function(questId, subIdx) {
+            const targetQuest = state.quests.find(q => q.id === questId);
+            if (!targetQuest) return;
+
+            if (!targetQuest.completedSubQuests) targetQuest.completedSubQuests = [];
+            
+            const targetIndexPos = targetQuest.completedSubQuests.indexOf(subIdx);
+            const subTaskLabel = (targetQuest.aiData && targetQuest.aiData.microQuests) ? targetQuest.aiData.microQuests[subIdx] : `Subtask Module ${subIdx}`;
+
+            if (targetIndexPos > -1) {
+                targetQuest.completedSubQuests.splice(targetIndexPos, 1);
+                logActivityEvent(`Unchecked Action Segment: "${subTaskLabel}" for quest "${targetQuest.name}"`);
+            } else {
+                targetQuest.completedSubQuests.push(subIdx);
+                injectEarnedRewardXp(15);
+                state.focusTimeMinutes += 15;
+                logActivityEvent(`Completed Action Segment: "${subTaskLabel}" for quest "${targetQuest.name}"`);
+            }
+            saveSystemCurrentState();
+            renderCoreDashboardHUD();
+            renderActiveQuestsLogBoard();
+            generateDailyPerformanceAnalyticalReport();
+        };
+
+        window.triggerAbsoluteQuestResolution = function(questId) {
+            const targetQuestIdx = state.quests.findIndex(q => q.id === questId);
+            if (targetQuestIdx === -1) return;
+
+            const questObj = state.quests[targetQuestIdx];
+            
+            let xpAllocationRewardValue = 100;
+            let allocatedMinutesGained = 60;
+            if (questObj.difficulty === 'easy') { xpAllocationRewardValue = 50; allocatedMinutesGained = 30; }
+            else if (questObj.difficulty === 'medium') { xpAllocationRewardValue = 150; allocatedMinutesGained = 60; }
+            else if (questObj.difficulty === 'hard') { xpAllocationRewardValue = 300; allocatedMinutesGained = 120; }
+            else if (questObj.difficulty === 'boss') { xpAllocationRewardValue = 500; allocatedMinutesGained = 240; }
+
+            state.focusTimeMinutes += allocatedMinutesGained;
+            const totalLevelUpsGained = injectEarnedRewardXp(xpAllocationRewardValue);
+            registerQuestCompletionStreakIncremental();
+            
+            logActivityEvent(`Claimed Victory Validation on Quest: "${questObj.name}" (+${xpAllocationRewardValue} XP)`);
+
+            state.quests.splice(targetQuestIdx, 1);
+            saveSystemCurrentState();
+
+            const rewardModal = document.getElementById('globalRewardNotificationModalSystemOverlay');
+            document.getElementById('rewardModalPrimaryHeading').innerText = "QUEST VICTORY ACQUIRED";
+            document.getElementById('rewardModalXpSubheading').innerText = `+${xpAllocationRewardValue} EXP DISTRIBUTION APPLIED`;
+            
+            const systemBadgesUnlockedTextList = evaluateAchievementMatrixUnlockCriteria();
+            if (systemBadgesUnlockedTextList.length > 0) {
+                document.getElementById('rewardModalAchievementText').innerText = `SYSTEM MILESTONE BADGE MET: ${systemBadgesUnlockedTextList.join(', ')}`;
+            } else {
+                document.getElementById('rewardModalAchievementText').innerText = `Progress tracked successfully. Total milestones completed: ${state.totalCompletedCount} Objectives`;
+            }
+
+            rewardModal.classList.add('active');
+
+            renderCoreDashboardHUD();
+            renderActiveQuestsLogBoard();
+            renderAchievementsGridMatrix();
+            generateDailyPerformanceAnalyticalReport();
+        };
+
+        document.getElementById('dismissModalRewardActionButton').addEventListener('click', () => {
+            document.getElementById('globalRewardNotificationModalSystemOverlay').classList.remove('active');
+        });
+
+        // =========================================================================
+        // CORE INTEGRATION WEB SPEECH API: VOICE COMMANDS INPUT INPUT CAPTURE
+        // =========================================================================
+        const voiceBtn = document.getElementById('voiceInputTriggerBtn');
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecConfigObject = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const operationalRecognizerInstance = new SpeechRecConfigObject();
+            operationalRecognizerInstance.lang = 'en-US';
+            operationalRecognizerInstance.interimResults = false;
+            operationalRecognizerInstance.maxAlternatives = 1;
+
+            voiceBtn.addEventListener('click', () => {
+                voiceBtn.innerText = "👂";
+                operationalRecognizerInstance.start();
+            });
+
+            operationalRecognizerInstance.addEventListener('result', (e) => {
+                const utteranceResultText = e.results[0][0].transcript;
+                document.getElementById('questNameInput').value = utteranceResultText;
+                voiceBtn.innerText = "🎤";
+                
+                if (utteranceResultText.toLowerCase().includes("by friday")) {
+                    const nextFridayObj = new Date();
+                    nextFridayObj.setDate(nextFridayObj.getDate() + (5 - nextFridayObj.getDay() + 7) % 7);
+                    nextFridayObj.setHours(17, 0, 0, 0);
+                    
+                    const year = nextFridayObj.getFullYear();
+                    const month = String(nextFridayObj.getMonth() + 1).padStart(2, '0');
+                    const day = String(nextFridayObj.getDate()).padStart(2, '0');
+                    const hours = String(nextFridayObj.getHours()).padStart(2, '0');
+                    const minutes = String(nextFridayObj.getMinutes()).padStart(2, '0');
+                    
+                    document.getElementById('questDeadlineInput').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+                }
+            });
+
+            operationalRecognizerInstance.addEventListener('speechend', () => {
+                operationalRecognizerInstance.stop();
+                voiceBtn.innerText = "🎤";
+            });
+            
+            operationalRecognizerInstance.addEventListener('error', () => {
+                voiceBtn.innerText = "🎤";
+            });
+
+        } else {
+            voiceBtn.style.display = 'none'; 
+        }
+
+        // =========================================================================
+        // SPEECH SYNTHESIS ENGINE INTERFACE: VOICE OUTPUT SPEECH PRODUCTION PIPELINE
+        // =========================================================================
+        function executeSpeechSynthesisTrack(textToSpeak) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const cleanTxt = textToSpeak.replace(/[•🚨⚠️💀🔥🔹🔒]/g, '');
+                const phraseInstance = new SpeechSynthesisUtterance(cleanTxt);
+                phraseInstance.rate = 1.0;
+                phraseInstance.pitch = 0.95;
+                window.speechSynthesis.speak(phraseInstance);
+            }
+        }
+
+        document.getElementById('talkToAiGuideTriggerBtn').addEventListener('click', async () => {
+            const guidePanelSpeechText = document.getElementById('guideSpeechText');
+            guidePanelSpeechText.innerText = "Conversational Voice Arrays sync active... Analyzing structural memory matrices...";
+            
+            let structuralContextLog = `The current user performance track shows Level ${state.level} [Rank: ${state.rank}]. Total focus execution time is ${state.focusTimeMinutes} minutes.`;
+            if (state.quests.length > 0) {
+                structuralContextLog += ` They have an outstanding unresolved focus target titled: "${state.quests[0].name}".`;
+            } else {
+                structuralContextLog += ` They currently have an empty operational backlog list.`;
+            }
+
+            if (!state.voiceMemory) state.voiceMemory = [];
+            const backgroundMemoryStr = state.voiceMemory.slice(-3).join(" | ");
+
+            const key = retrieveValidatedApiKey();
+            let strategyFeedbackOutput = "";
+
+            if (key) {
+                const endpointUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`;
+                const coachPrompt = `
+                    You are the AI Guide Mentor inside the Focus Hunter RPG task platform application software.
+                    Provide an inspiring, psychologically grounded, highly supportive coaching address targeting this situation context:
+                    "${structuralContextLog}"
+                    Conversational dialogue history context to avoid repetition: "${backgroundMemoryStr}"
+                    
+                    Keep your output block response short, max 3 sentences. Address the user directly as "Hunter". Understand their current quest status, provide tailored psychological or technical strategies, and explicitly suggest their next optimal action point. Never use recurring canned phrases.
+                `;
+
+                try {
+                    const res = await fetch(endpointUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: coachPrompt }] }] })
+                    });
+                    if (res.ok) {
+                        const parsedData = await res.json();
+                        strategyFeedbackOutput = parsedData.candidates[0].content.parts[0].text.trim();
+                    } else {
+                        strategyFeedbackOutput = "Hunter, your performance vector requires clean task resolution loops. Eliminate peripheral noise and prioritize your active log parameters right now.";
+                    }
+                } catch(err) {
+                    strategyFeedbackOutput = "Hunter, transmission noise detected. Recalibrate your internal intention settings and execute the primary microtask node.";
+                }
+            } else {
+                const manualDialogueVariations = [
+                    `Hunter, your focus metrics track at ${state.focusTimeMinutes} minutes of absolute discipline. Take the immediate next micro action step right now.`,
+                    `The level ${state.level} trajectory demands immediate operational focus. Isolate your active project parameters and engage the framework without hesitation.`,
+                    `True habit sovereignty is forged through deep block execution cycles. Minimize peripheral sensory tabs right now.`,
+                    `Every microquest checked reinforces your path towards absolute professional autonomy. Protect your streak counter and advance!`
+                ];
+                strategyFeedbackOutput = manualDialogueVariations[Math.floor(Math.random() * manualDialogueVariations.length)];
+            }
+
+            state.voiceMemory.push(strategyFeedbackOutput);
+            if (state.voiceMemory.length > 10) state.voiceMemory.shift();
+            saveSystemCurrentState();
+
+            guidePanelSpeechText.innerText = strategyFeedbackOutput;
+            executeSpeechSynthesisTrack(strategyFeedbackOutput);
+            logActivityEvent(`Engaged conversational dialogue loop with AI Guide Voice Coach.`);
+        });
+
+        // =========================================================================
+        // INTERACTIVE RECOVERY SYSTEMS LOGIC PANELS: RECOVERY MODES
+        // =========================================================================
+        document.getElementById('emergencyOverwhelmedTriggerBtn').addEventListener('click', async () => {
+            const guidePanelSpeechText = document.getElementById('guideSpeechText');
+            guidePanelSpeechText.innerText = "Analyzing current structural friction... Deploying Overwhelmed Protocol 2.0 matrix components...";
+            
+            if (state.quests.length > 0) {
+                const targetCurrentQuest = state.quests[0];
+                const cleanSurvivalPlan = (targetCurrentQuest.aiData && targetCurrentQuest.aiData.emergencySurvivalPlan) 
+                    ? targetCurrentQuest.aiData.emergencySurvivalPlan 
+                    : "Open a blank scratchpad file and manually outline your immediate entry variable.";
+
+                const microTaskActionPlanText = `[OVERWHELMED PROTOCOL 2.0 ACTIVATED]\n\nHunter, bypass cognitive overload layers completely. Execute this domain-targeted action plan immediately:\n\n• Action 1: ${cleanSurvivalPlan}\n• Action 2: Set an isolated mechanical countdown timer for exactly 5 minutes.\n• Action 3: Commit strictly to this singular workspace parameter until the timer runs out.`;
+
+                guidePanelSpeechText.innerText = microTaskActionPlanText;
+                executeSpeechSynthesisTrack(`Hunter, bypass cognitive overload layers completely. Initiate your task diagnostic routine for ${targetCurrentQuest.name} immediately.`);
+                logActivityEvent(`Triggered Overwhelmed Protocol 2.0 for "${targetCurrentQuest.name}"`);
+            } else {
+                const blankLogFrictionPlanText = `[OVERWHELMED PROTOCOL 2.0 ACTIVATED]\n\nHunter, your active tracking backlog is empty. Clear structural paralysis loops via these steps:\n\n• Step 1: Input a single clear operational objective title inside the title field.\n• Step 2: Position the deadline target window for exactly tomorrow evening to eliminate crunch anxiety.\n• Step 3: Deploy the Engage Strategy Algorithm to let the system fragment the structural weight.\n• Step 4: Instantly execute just the first subquest checkbox element to validate trajectory momentum.`;
+
+                guidePanelSpeechText.innerText = blankLogFrictionPlanText;
+                executeSpeechSynthesisTrack("Hunter, initialize a single tracking parameters quest log now to conquer cognitive friction.");
+                logActivityEvent(`Triggered Overwhelmed Protocol 2.0 (Empty Registry Backlog Context)`);
+            }
+        });
+
+        // =========================================================================
+        // APP INITIALIZATION METHOD GATEWAY INTERFACE ATOM CALL POINT DEPLOYMENT
+        // =========================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeSystemLoadState();
+            
+            setInterval(() => {
+                renderCoreDashboardHUD();
+            }, 30000);
+
+            document.getElementById('reminderStartQuestActionBtn').onclick = () => {
+                const modal = document.getElementById('globalQuestReminderOperationalModalSystemOverlay');
+                const qId = modal.getAttribute('data-target-quest-id');
+                window.handleReminderModalActionClick('start', qId);
+            };
+            document.getElementById('reminderSnoozeQuestActionBtn').onclick = () => {
+                const modal = document.getElementById('globalQuestReminderOperationalModalSystemOverlay');
+                const qId = modal.getAttribute('data-target-quest-id');
+                window.handleReminderModalActionClick('snooze', qId);
+            };
+            document.getElementById('reminderDismissQuestActionBtn').onclick = () => {
+                const modal = document.getElementById('globalQuestReminderOperationalModalSystemOverlay');
+                const qId = modal.getAttribute('data-target-quest-id');
+                window.handleReminderModalActionClick('dismiss', qId);
+            };
+        });
+    </script>
+</body>
+</html>
